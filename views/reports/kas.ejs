@@ -1,0 +1,79 @@
+<%- include('../partials/head') %>
+
+<div class="card">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h2 class="text-[18px]">Buku Kas Harian</h2>
+      <p class="mt-1 text-[14px] text-ash"><%= formatHariLengkap(kas.start) %></p>
+    </div>
+    <form method="get" action="/reports/kas" class="no-print flex items-end gap-2">
+      <div>
+        <label class="label-mono" for="tanggal">Tanggal</label>
+        <input class="input mt-1.5" id="tanggal" name="tanggal" type="date" value="<%= tanggal %>">
+      </div>
+      <button type="submit" class="btn btn-secondary btn-sm">Lihat</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">Cetak</button>
+    </form>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
+  <div class="card">
+    <p class="label-mono">Saldo Awal</p>
+    <p class="stat-value mt-3 text-[20px]"><%= formatRupiah(kas.saldoAwal) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Kas Masuk</p>
+    <p class="stat-value mt-3 text-[20px] text-success"><%= formatRupiah(kas.totalMasuk) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Kas Keluar</p>
+    <p class="stat-value mt-3 text-[20px] text-danger"><%= formatRupiah(kas.totalKeluar) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Saldo Akhir</p>
+    <p class="stat-value mt-3 text-[20px] text-ink"><%= formatRupiah(kas.saldoAkhir) %></p>
+  </div>
+</div>
+
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Waktu</th>
+          <th>Keterangan</th>
+          <th class="text-right">Masuk</th>
+          <th class="text-right">Keluar</th>
+          <th class="text-right">Saldo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!kas.rows.length) { %>
+        <tr>
+          <td colspan="5" class="py-10 text-center text-ash">Tidak ada transaksi kas pada tanggal ini.</td>
+        </tr>
+        <% } %>
+        <% kas.rows.forEach(function (row) { %>
+        <tr>
+          <td class="font-mono text-[12px] text-ash"><%= formatTanggalWaktu(row.tanggal) %></td>
+          <td class="text-[14px]"><%= row.keterangan %></td>
+          <td class="text-right font-mono text-[13px] text-success"><%= row.tipe === 'masuk' ? formatRupiah(row.jumlah) : '' %></td>
+          <td class="text-right font-mono text-[13px] text-danger"><%= row.tipe === 'keluar' ? formatRupiah(row.jumlah) : '' %></td>
+          <td class="text-right font-mono text-[13px] text-ink"><%= formatRupiah(row.saldo) %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+      <tfoot>
+        <tr class="border-t border-hairline-strong">
+          <td colspan="2" class="label-mono text-right">Total</td>
+          <td class="text-right font-mono text-[14px] text-success"><%= formatRupiah(kas.totalMasuk) %></td>
+          <td class="text-right font-mono text-[14px] text-danger"><%= formatRupiah(kas.totalKeluar) %></td>
+          <td class="text-right font-mono text-[15px] text-ink"><%= formatRupiah(kas.saldoAkhir) %></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

@@ -1,0 +1,58 @@
+<%
+const formAction = typeof action !== 'undefined' ? action : currentPath;
+%>
+<form method="get" action="<%= formAction %>" class="flex flex-wrap items-end gap-3">
+  <div class="min-w-[150px]">
+    <label class="label-mono" for="period">Periode</label>
+    <select class="input mt-1.5" id="period" name="period">
+      <option value="harian" <%= period.period === 'harian' ? 'selected' : '' %>>Harian</option>
+      <option value="bulanan" <%= period.period === 'bulanan' ? 'selected' : '' %>>Bulanan</option>
+      <option value="tahunan" <%= period.period === 'tahunan' ? 'selected' : '' %>>Tahunan</option>
+      <option value="custom" <%= period.period === 'custom' ? 'selected' : '' %>>Rentang Kustom</option>
+    </select>
+  </div>
+
+  <div data-period-group="harian">
+    <label class="label-mono" for="tanggal">Tanggal</label>
+    <input class="input mt-1.5" id="tanggal" name="tanggal" type="date" value="<%= period.tanggal || '' %>">
+  </div>
+
+  <div data-period-group="bulanan">
+    <label class="label-mono" for="bulan">Bulan</label>
+    <input class="input mt-1.5" id="bulan" name="bulan" type="month" value="<%= period.bulan || '' %>">
+  </div>
+
+  <div data-period-group="tahunan">
+    <label class="label-mono" for="tahun">Tahun</label>
+    <input class="input mt-1.5 w-[110px]" id="tahun" name="tahun" type="number" min="2000" max="2100"
+      value="<%= period.tahun || new Date().getFullYear() %>">
+  </div>
+
+  <div data-period-group="custom" class="flex items-end gap-2">
+    <div>
+      <label class="label-mono" for="start">Dari</label>
+      <input class="input mt-1.5" id="start" name="start" type="date" value="<%= period.startStr || '' %>">
+    </div>
+    <div>
+      <label class="label-mono" for="end">Sampai</label>
+      <input class="input mt-1.5" id="end" name="end" type="date" value="<%= period.endStr || '' %>">
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-secondary btn-sm">Terapkan</button>
+</form>
+
+<script>
+  (() => {
+    const select = document.getElementById('period');
+    if (!select) return;
+    const groups = document.querySelectorAll('[data-period-group]');
+    const update = () => {
+      groups.forEach((group) => {
+        group.style.display = group.dataset.periodGroup === select.value ? '' : 'none';
+      });
+    };
+    select.addEventListener('change', update);
+    update();
+  })();
+</script>

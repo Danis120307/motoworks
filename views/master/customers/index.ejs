@@ -1,0 +1,71 @@
+<%- include('../../partials/head') %>
+
+<div class="card-flat overflow-hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-5 py-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <h2 class="text-[18px]">Daftar Pelanggan</h2>
+      <span class="label-mono"><%= pagination.total %> pelanggan</span>
+    </div>
+    <a href="/customers/new" class="btn btn-primary btn-sm">
+      <%- include('../../partials/icon', { name: 'plus', className: 'h-4 w-4' }) %> Tambah Pelanggan
+    </a>
+  </div>
+
+  <div class="border-b border-hairline px-5 py-4">
+    <form method="get" action="/customers" class="flex flex-wrap items-end gap-3">
+      <div class="min-w-[220px] flex-1">
+        <label class="label-mono" for="q">Cari</label>
+        <input class="input mt-1.5" id="q" name="q" value="<%= filters.q %>" placeholder="Nama, no HP, plat, motor">
+      </div>
+      <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
+      <% if (filters.q) { %>
+      <a href="/customers" class="btn btn-ghost btn-sm">Reset</a>
+      <% } %>
+    </form>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>No HP</th>
+          <th>Motor</th>
+          <th>Order</th>
+          <th class="text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!customers.length) { %>
+        <tr>
+          <td colspan="5" class="py-10 text-center text-ash">Belum ada pelanggan.</td>
+        </tr>
+        <% } %>
+        <% customers.forEach(function (customer) { %>
+        <tr>
+          <td class="text-ink"><%= customer.nama || 'Tanpa nama' %></td>
+          <td class="font-mono text-[13px]"><%= customer.noHp || '-' %></td>
+          <td>
+            <p class="text-body"><%= customer.modelMotor || '-' %></p>
+            <% if (customer.platMotor) { %>
+            <p class="font-mono text-[12px] text-ash"><%= customer.platMotor %></p>
+            <% } %>
+          </td>
+          <td class="font-mono text-[13px]"><%= customer._count.serviceOrders %></td>
+          <td>
+            <div class="flex justify-end gap-2">
+              <a href="/customers/<%= customer.id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
+              <form method="post" action="/customers/<%= customer.id %>/delete">
+                <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus pelanggan ini?">Hapus</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../../partials/pagination') %>
+<%- include('../../partials/foot') %>

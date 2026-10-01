@@ -1,0 +1,32 @@
+<header
+  class="sticky top-0 z-30 flex h-[60px] items-center justify-between gap-3 border-b border-hairline bg-canvas/90 px-4 backdrop-blur lg:px-8">
+  <div class="flex min-w-0 items-center gap-3">
+    <button type="button" id="menuToggle" class="btn btn-ghost btn-sm lg:hidden" aria-label="Buka menu">
+      <%- include('icon', { name: 'menu' }) %>
+    </button>
+    <div class="min-w-0">
+      <p class="font-mono text-[10px] tracking-[0.15em] text-mute uppercase"><%= appName %></p>
+      <h1 class="truncate text-[19px] leading-tight"><%= title %></h1>
+    </div>
+  </div>
+
+  <div class="flex shrink-0 items-center gap-3">
+    <% if (lowStockCount > 0) { %>
+    <a href="/stock?filter=menipis" class="badge hidden bg-warning/15 text-warning sm:inline-flex">
+      <%= lowStockCount %> stok menipis
+    </a>
+    <% } %>
+
+    <% if (user) { %>
+    <div class="hidden text-right sm:block">
+      <p class="text-[14px] text-ink"><%= user.nama %></p>
+      <p class="font-mono text-[10px] tracking-wider text-mute uppercase"><%= user.role %></p>
+    </div>
+    <form action="/logout" method="post">
+      <button type="submit" class="btn btn-secondary btn-sm">Keluar</button>
+    </form>
+    <% } else { %>
+    <a href="/login" class="btn btn-primary btn-sm">Masuk</a>
+    <% } %>
+  </div>
+</header>

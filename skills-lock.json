@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "skills": {
+    "design-taste-frontend": {
+      "source": "Leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/taste-skill/SKILL.md",
+      "computedHash": "899b84384f74f540ea5284d9b2e9234e050998b42eacc805410b518d4226c0b3"
+    },
+    "ux-writing": {
+      "source": "slb2248/ai-ux-skills",
+      "ref": "main",
+      "sourceType": "github",
+      "skillPath": "skills/ux-writing/SKILL.md",
+      "computedHash": "d39d41aa670e01e45bdf376f7384b07fb1c517731a8754881067fe630ca1683b"
+    }
+  }
+}

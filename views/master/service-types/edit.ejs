@@ -1,0 +1,31 @@
+<%- include('../../partials/head') %>
+
+<div class="mx-auto max-w-lg">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]">Edit Jenis Layanan</h2>
+      <a href="/service-types" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+
+    <form method="post" action="/service-types/<%= serviceType.id %>/update" class="mt-5 space-y-4">
+      <div>
+        <label class="label-mono" for="namaLayanan">Nama Layanan</label>
+        <input class="input mt-1.5" id="namaLayanan" name="namaLayanan" value="<%= values.namaLayanan || '' %>" required>
+        <% if (errors.namaLayanan) { %><p class="error-text"><%= errors.namaLayanan[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="hargaJasa">Harga Jasa (Rp)</label>
+        <input class="input mt-1.5" id="hargaJasa" name="hargaJasa" type="number" min="0" step="1"
+          value="<%= values.hargaJasa !== undefined ? values.hargaJasa : '' %>" required>
+        <% if (errors.hargaJasa) { %><p class="error-text"><%= errors.hargaJasa[0] %></p><% } %>
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </form>
+
+    <form method="post" action="/service-types/<%= serviceType.id %>/delete" class="mt-5 border-t border-hairline pt-5">
+      <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus layanan ini?">Hapus Layanan</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

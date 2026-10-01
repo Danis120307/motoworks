@@ -1,0 +1,71 @@
+<%- include('../../partials/head') %>
+
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+  <div class="card h-fit xl:col-span-1">
+    <h2 class="text-[18px]">Tambah Supplier</h2>
+    <form method="post" action="/suppliers" class="mt-4 space-y-4">
+      <div>
+        <label class="label-mono" for="nama">Nama Supplier</label>
+        <input class="input mt-1.5" id="nama" name="nama" value="<%= values.nama || '' %>" required>
+        <% if (errors.nama) { %><p class="error-text"><%= errors.nama[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="kontak">Kontak</label>
+        <input class="input mt-1.5" id="kontak" name="kontak" value="<%= values.kontak || '' %>" placeholder="08xx">
+        <% if (errors.kontak) { %><p class="error-text"><%= errors.kontak[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="alamat">Alamat</label>
+        <textarea class="input mt-1.5" id="alamat" name="alamat" rows="2"><%= values.alamat || '' %></textarea>
+        <% if (errors.alamat) { %><p class="error-text"><%= errors.alamat[0] %></p><% } %>
+      </div>
+      <button type="submit" class="btn btn-primary w-full">Simpan</button>
+    </form>
+  </div>
+
+  <div class="card-flat overflow-hidden xl:col-span-2">
+    <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Daftar Supplier</h2>
+      <span class="label-mono"><%= suppliers.length %> supplier</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Kontak</th>
+            <th>Transaksi</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!suppliers.length) { %>
+          <tr>
+            <td colspan="4" class="py-10 text-center text-ash">Belum ada supplier.</td>
+          </tr>
+          <% } %>
+          <% suppliers.forEach(function (supplier) { %>
+          <tr>
+            <td>
+              <p class="text-ink"><%= supplier.nama %></p>
+              <% if (supplier.alamat) { %><p class="text-[13px] text-ash"><%= supplier.alamat %></p><% } %>
+            </td>
+            <td class="font-mono text-[13px]"><%= supplier.kontak || '-' %></td>
+            <td class="font-mono text-[13px]"><%= supplier._count.stockMovements %></td>
+            <td>
+              <div class="flex justify-end gap-2">
+                <a href="/suppliers/<%= supplier.id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
+                <form method="post" action="/suppliers/<%= supplier.id %>/delete">
+                  <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus supplier ini?">Hapus</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

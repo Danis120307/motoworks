@@ -1,0 +1,100 @@
+<%- include('../../partials/head') %>
+
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div class="card">
+    <p class="label-mono">Sparepart</p>
+    <p class="mt-2 text-[18px] text-ink"><%= part.nama %></p>
+    <p class="font-mono text-[12px] text-ash"><%= part.kodeItem %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Stok Saat Ini</p>
+    <p class="stat-value mt-2 <%= part.stokSaatIni <= part.stokMinimum ? 'text-danger' : '' %>">
+      <%= part.stokSaatIni %>
+    </p>
+    <p class="font-mono text-[11px] text-mute uppercase">minimum <%= part.stokMinimum %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Nilai Stok (Harga Beli)</p>
+    <p class="stat-value mt-2"><%= formatRupiah(part.stokSaatIni * part.hargaBeli) %></p>
+  </div>
+</div>
+
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-5 py-4">
+    <h2 class="text-[18px]">Kartu Stok</h2>
+    <div class="flex flex-wrap items-center gap-3">
+      <form method="get" action="/spareparts/<%= part.id %>/kartu-stok" class="flex flex-wrap items-end gap-2">
+        <div>
+          <label class="label-mono" for="start">Dari</label>
+          <input class="input mt-1.5 h-9 w-[150px]" id="start" name="start" type="date" value="<%= filters.start %>">
+        </div>
+        <div>
+          <label class="label-mono" for="end">Sampai</label>
+          <input class="input mt-1.5 h-9 w-[150px]" id="end" name="end" type="date" value="<%= filters.end %>">
+        </div>
+        <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+        <a href="/spareparts/<%= part.id %>/kartu-stok" class="btn btn-ghost btn-sm">Reset</a>
+      </form>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Tipe</th>
+          <th class="text-right">Masuk</th>
+          <th class="text-right">Keluar</th>
+          <th class="text-right">Saldo</th>
+          <th>Keterangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (filters.start) { %>
+        <tr>
+          <td colspan="4" class="text-[13px] text-ash">Saldo awal periode</td>
+          <td class="text-right font-mono text-[14px] text-ink"><%= saldoAwal %></td>
+          <td></td>
+        </tr>
+        <% } %>
+        <% if (!rows.length) { %>
+        <tr>
+          <td colspan="6" class="py-10 text-center text-ash">Belum ada mutasi stok pada periode ini.</td>
+        </tr>
+        <% } %>
+        <% rows.forEach(function (movement) { %>
+        <tr>
+          <td class="font-mono text-[12px] text-ash"><%= formatTanggalWaktu(movement.tanggal) %></td>
+          <td>
+            <span class="badge <%= movementBadgeClass(movement.tipe) %>"><%= movement.tipe %></span>
+          </td>
+          <td class="text-right font-mono text-[13px] text-success"><%= movement.tipe === 'masuk' ? movement.jumlah : '' %></td>
+          <td class="text-right font-mono text-[13px] text-danger"><%= movement.tipe === 'keluar' ? movement.jumlah : '' %></td>
+          <td class="text-right font-mono text-[13px] text-ink"><%= movement.saldo %></td>
+          <td class="text-[13px]">
+            <%= movement.keterangan || '-' %>
+            <% if (movement.supplier) { %><span class="text-ash"> · <%= movement.supplier.nama %></span><% } %>
+            <% if (movement.serviceOrder) { %>
+            <a class="link" href="/orders">· <%= movement.serviceOrder.nomorOrder %></a>
+            <% } %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+      <tfoot>
+        <tr class="border-t border-hairline-strong">
+          <td colspan="4" class="text-right label-mono">Saldo akhir</td>
+          <td class="text-right font-mono text-[15px] text-ink"><%= saldoAkhir %></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="mt-4">
+  <a href="/spareparts" class="btn btn-ghost btn-sm">Kembali ke Data Sparepart</a>
+</div>
+
+<%- include('../../partials/foot') %>

@@ -1,0 +1,119 @@
+<%- include('../partials/head') %>
+
+<form method="post" action="/stock/masuk" class="space-y-6">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]">Pembelian Stok dari Supplier</h2>
+      <a href="/stock" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+
+    <% if (errors.items) { %>
+    <div class="mt-4 rounded-md border border-danger/20 border-l-[3px] border-l-danger bg-danger/10 px-4 py-3 text-[14px] text-danger">
+      <%= errors.items.join(' ') %>
+    </div>
+    <% } %>
+
+    <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div>
+        <label class="label-mono" for="supplierId">Supplier</label>
+        <select class="input mt-1.5" id="supplierId" name="supplierId">
+          <option value="">Tanpa supplier</option>
+          <% suppliers.forEach(function (supplier) { %>
+          <option value="<%= supplier.id %>" <%= String(values.supplierId) === String(supplier.id) ? 'selected' : '' %>>
+            <%= supplier.nama %>
+          </option>
+          <% }); %>
+        </select>
+      </div>
+      <div>
+        <label class="label-mono" for="tanggal">Tanggal</label>
+        <input class="input mt-1.5" id="tanggal" name="tanggal" type="date" value="<%= values.tanggal %>" required>
+      </div>
+      <div>
+        <label class="label-mono" for="keterangan">Keterangan</label>
+        <input class="input mt-1.5" id="keterangan" name="keterangan" value="<%= values.keterangan %>"
+          placeholder="cth. Pembelian mingguan">
+      </div>
+    </div>
+  </div>
+
+  <div class="card-flat overflow-hidden">
+    <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Item Pembelian</h2>
+      <button type="button" id="addStockInRow" class="btn btn-secondary btn-sm">
+        <%- include('../partials/icon', { name: 'plus', className: 'h-4 w-4' }) %> Tambah Baris
+      </button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th class="min-w-[240px]">Sparepart</th>
+            <th class="w-[120px]">Jumlah</th>
+            <th class="w-[180px]">Harga Beli (Rp)</th>
+            <th class="w-[80px]"></th>
+          </tr>
+        </thead>
+        <tbody id="stockInRows">
+          <% rows.forEach(function (row) { %>
+          <tr>
+            <td>
+              <select class="input" name="sparePartId">
+                <option value="">Pilih sparepart</option>
+                <% parts.forEach(function (part) { %>
+                <option value="<%= part.id %>" data-harga="<%= part.hargaBeli %>"
+                  <%= String(row.sparePartId) === String(part.id) ? 'selected' : '' %>>
+                  <%= part.kodeItem %> · <%= part.nama %> (stok <%= part.stokSaatIni %>)
+                </option>
+                <% }); %>
+              </select>
+            </td>
+            <td>
+              <input class="input font-mono" name="qty" type="number" min="1" step="1" value="<%= row.qty %>">
+            </td>
+            <td>
+              <input class="input font-mono" name="hargaBeli" type="number" min="0" step="1" value="<%= row.hargaBeli %>">
+            </td>
+            <td class="text-center">
+              <button type="button" data-remove-row class="btn btn-ghost btn-sm text-danger">Hapus</button>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <template id="stockInRowTemplate">
+      <tr>
+        <td>
+          <select class="input" name="sparePartId">
+            <option value="">Pilih sparepart</option>
+            <% parts.forEach(function (part) { %>
+            <option value="<%= part.id %>" data-harga="<%= part.hargaBeli %>">
+              <%= part.kodeItem %> · <%= part.nama %> (stok <%= part.stokSaatIni %>)
+            </option>
+            <% }); %>
+          </select>
+        </td>
+        <td><input class="input font-mono" name="qty" type="number" min="1" step="1" value="1"></td>
+        <td><input class="input font-mono" name="hargaBeli" type="number" min="0" step="1"></td>
+        <td class="text-center">
+          <button type="button" data-remove-row class="btn btn-ghost btn-sm text-danger">Hapus</button>
+        </td>
+      </tr>
+    </template>
+  </div>
+
+  <div class="card flex flex-wrap items-center justify-between gap-4">
+    <label class="flex items-center gap-3 text-[14px] text-body">
+      <input type="checkbox" name="catatPengeluaran" value="1" <%= values.catatPengeluaran ? 'checked' : '' %>
+        class="h-4 w-4 rounded-xs border-hairline-strong bg-canvas accent-secondary">
+      Catat otomatis sebagai pengeluaran (Belanja Sparepart)
+    </label>
+    <div class="flex gap-2">
+      <a href="/stock" class="btn btn-ghost">Batal</a>
+      <button type="submit" class="btn btn-primary">Simpan Stok Masuk</button>
+    </div>
+  </div>
+</form>
+
+<%- include('../partials/foot', { pageScripts: ['/js/stock-in.js'] }) %>

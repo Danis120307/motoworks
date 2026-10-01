@@ -1,0 +1,76 @@
+<%- include('../partials/head') %>
+
+<div class="mx-auto max-w-3xl">
+  <form method="post" action="/orders" class="space-y-6">
+    <div class="card">
+      <div class="flex items-center justify-between">
+        <h2 class="text-[18px]">Buat Order Service</h2>
+        <a href="/orders" class="btn btn-ghost btn-sm">Kembali</a>
+      </div>
+
+      <div class="mt-5 space-y-4">
+        <div>
+          <label class="label-mono" for="customerId">Pelanggan Terdaftar</label>
+          <select class="input mt-1.5" id="customerId" name="customerId">
+            <option value="">Pelanggan baru / tanpa data</option>
+            <% customers.forEach(function (customer) { %>
+            <option value="<%= customer.id %>" <%= String(values.customerId || '') === String(customer.id) ? 'selected' : '' %>>
+              <%= customer.nama || 'Tanpa nama' %><%= customer.platMotor ? ' · ' + customer.platMotor : '' %>
+            </option>
+            <% }); %>
+          </select>
+          <p class="mt-2 text-[13px] text-ash">
+            Pilih pelanggan lama, atau isi data di bawah jika pelanggan baru.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 rounded-md border border-hairline bg-canvas p-4 sm:grid-cols-2">
+          <div>
+            <label class="label-mono" for="nama">Nama Pelanggan</label>
+            <input class="input mt-1.5" id="nama" name="nama" value="<%= values.nama || '' %>">
+          </div>
+          <div>
+            <label class="label-mono" for="noHp">No HP</label>
+            <input class="input mt-1.5" id="noHp" name="noHp" value="<%= values.noHp || '' %>">
+          </div>
+          <div>
+            <label class="label-mono" for="platMotor">Plat Motor</label>
+            <input class="input mt-1.5" id="platMotor" name="platMotor" value="<%= values.platMotor || '' %>"
+              placeholder="B 1234 XYZ">
+          </div>
+          <div>
+            <label class="label-mono" for="modelMotor">Model Motor</label>
+            <input class="input mt-1.5" id="modelMotor" name="modelMotor" value="<%= values.modelMotor || '' %>"
+              placeholder="Vario 125">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label-mono" for="mekanik">Mekanik</label>
+            <input class="input mt-1.5" id="mekanik" name="mekanik" value="<%= values.mekanik || '' %>"
+              placeholder="Nama mekanik">
+          </div>
+          <div>
+            <label class="label-mono" for="tanggalMasuk">Tanggal Masuk</label>
+            <input class="input mt-1.5" id="tanggalMasuk" name="tanggalMasuk" type="date"
+              value="<%= values.tanggalMasuk || '' %>">
+          </div>
+        </div>
+
+        <div>
+          <label class="label-mono" for="keluhan">Keluhan / Pekerjaan</label>
+          <textarea class="input mt-1.5" id="keluhan" name="keluhan" rows="3"
+            placeholder="cth. Servis rutin, ganti oli, suara kasar di CVT"><%= values.keluhan || '' %></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <a href="/orders" class="btn btn-ghost">Batal</a>
+      <button type="submit" class="btn btn-primary">Buat Order</button>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/foot') %>

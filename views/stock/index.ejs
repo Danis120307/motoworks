@@ -1,0 +1,129 @@
+<%- include('../partials/head') %>
+
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="flex flex-wrap gap-2">
+    <a href="/stock/masuk" class="btn btn-primary btn-sm">
+      <%- include('../partials/icon', { name: 'plus', className: 'h-4 w-4' }) %> Stok Masuk
+    </a>
+    <a href="/stock/keluar" class="btn btn-secondary btn-sm">Stok Keluar</a>
+    <a href="/stock/opname" class="btn btn-secondary btn-sm">Stok Opname</a>
+  </div>
+  <% if (lowStock.length) { %>
+  <a href="/spareparts?menipis=1" class="badge bg-warning/15 text-warning">
+    <%= lowStock.length %> item di bawah stok minimum
+  </a>
+  <% } %>
+</div>
+
+<% if (lowStock.length) { %>
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+    <h2 class="text-[18px]">Stok Menipis</h2>
+    <span class="label-mono">perlu restock</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>Nama</th>
+          <th>Kategori</th>
+          <th class="text-right">Stok</th>
+          <th class="text-right">Minimum</th>
+          <th class="text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% lowStock.forEach(function (part) { %>
+        <tr>
+          <td class="font-mono text-[13px] text-ink"><%= part.kodeItem %></td>
+          <td class="text-ink"><%= part.nama %></td>
+          <td class="text-[14px]"><%= part.category ? part.category.namaKategori : '-' %></td>
+          <td class="text-right font-mono text-[13px] text-danger"><%= part.stokSaatIni %></td>
+          <td class="text-right font-mono text-[13px]"><%= part.stokMinimum %></td>
+          <td class="text-right">
+            <a href="/stock/masuk" class="btn btn-secondary btn-sm">Restock</a>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% } %>
+
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-5 py-4">
+    <h2 class="text-[18px]">Riwayat Mutasi Stok</h2>
+    <span class="label-mono"><%= pagination.total %> mutasi</span>
+  </div>
+
+  <div class="border-b border-hairline px-5 py-4">
+    <form method="get" action="/stock" class="flex flex-wrap items-end gap-3">
+      <div class="min-w-[160px]">
+        <label class="label-mono" for="tipe">Tipe</label>
+        <select class="input mt-1.5" id="tipe" name="tipe">
+          <option value="">Semua</option>
+          <option value="masuk" <%= filters.tipe === 'masuk' ? 'selected' : '' %>>Masuk</option>
+          <option value="keluar" <%= filters.tipe === 'keluar' ? 'selected' : '' %>>Keluar</option>
+        </select>
+      </div>
+      <div>
+        <label class="label-mono" for="start">Dari</label>
+        <input class="input mt-1.5 h-11 w-[150px]" id="start" name="start" type="date" value="<%= filters.start %>">
+      </div>
+      <div>
+        <label class="label-mono" for="end">Sampai</label>
+        <input class="input mt-1.5 h-11 w-[150px]" id="end" name="end" type="date" value="<%= filters.end %>">
+      </div>
+      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+      <a href="/stock" class="btn btn-ghost btn-sm">Reset</a>
+    </form>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Tipe</th>
+          <th>Sparepart</th>
+          <th class="text-right">Jumlah</th>
+          <th>Keterangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!movements.length) { %>
+        <tr>
+          <td colspan="5" class="py-10 text-center text-ash">Belum ada mutasi stok.</td>
+        </tr>
+        <% } %>
+        <% movements.forEach(function (movement) { %>
+        <tr>
+          <td class="font-mono text-[12px] text-ash"><%= formatTanggalWaktu(movement.tanggal) %></td>
+          <td>
+            <span class="badge <%= movementBadgeClass(movement.tipe) %>"><%= movement.tipe %></span>
+          </td>
+          <td>
+            <a href="/spareparts/<%= movement.sparePartId %>/kartu-stok" class="text-ink hover:text-secondary">
+              <%= movement.sparePart.nama %>
+            </a>
+            <p class="font-mono text-[11px] text-ash"><%= movement.sparePart.kodeItem %></p>
+          </td>
+          <td class="text-right font-mono text-[13px] <%= movement.tipe === 'masuk' ? 'text-success' : 'text-danger' %>">
+            <%= movement.tipe === 'masuk' ? '+' : '-' %><%= movement.jumlah %>
+          </td>
+          <td class="text-[13px]">
+            <%= movement.keterangan || '-' %>
+            <% if (movement.supplier) { %><span class="text-ash"> · <%= movement.supplier.nama %></span><% } %>
+            <% if (movement.serviceOrder) { %><span class="text-ash"> · <%= movement.serviceOrder.nomorOrder %></span><% } %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/pagination') %>
+<%- include('../partials/foot') %>

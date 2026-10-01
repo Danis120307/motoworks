@@ -1,0 +1,100 @@
+<%- include('../partials/head') %>
+
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+  <div class="space-y-6 xl:col-span-1">
+    <div class="card">
+      <h2 class="text-[18px]">Catat Pengeluaran</h2>
+      <form method="post" action="/expenses" class="mt-4 space-y-4">
+        <div>
+          <label class="label-mono" for="kategori">Kategori</label>
+          <select class="input mt-1.5" id="kategori" name="kategori" required>
+            <% EXPENSE_CATEGORIES.forEach(function (category) { %>
+            <option value="<%= category %>" <%= values.kategori === category ? 'selected' : '' %>><%= category %></option>
+            <% }); %>
+          </select>
+          <% if (errors.kategori) { %><p class="error-text"><%= errors.kategori[0] %></p><% } %>
+        </div>
+        <div>
+          <label class="label-mono" for="keterangan">Keterangan</label>
+          <input class="input mt-1.5" id="keterangan" name="keterangan" value="<%= values.keterangan || '' %>"
+            placeholder="cth. Beli oli untuk stok">
+          <% if (errors.keterangan) { %><p class="error-text"><%= errors.keterangan[0] %></p><% } %>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label-mono" for="jumlah">Jumlah (Rp)</label>
+            <input class="input mt-1.5 font-mono" id="jumlah" name="jumlah" type="number" min="1" step="1"
+              value="<%= values.jumlah !== undefined ? values.jumlah : '' %>" required>
+            <% if (errors.jumlah) { %><p class="error-text"><%= errors.jumlah[0] %></p><% } %>
+          </div>
+          <div>
+            <label class="label-mono" for="tanggal">Tanggal</label>
+            <input class="input mt-1.5" id="tanggal" name="tanggal" type="date"
+              value="<%= values.tanggal || new Date().toISOString().slice(0, 10) %>">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-full">Simpan Pengeluaran</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="space-y-6 xl:col-span-2">
+    <div class="card flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="label-mono">Total Pengeluaran Bulan Ini</p>
+        <p class="stat-value mt-2 text-danger"><%= formatRupiah(totalBulan) %></p>
+      </div>
+      <form method="get" action="/expenses" class="flex items-end gap-2">
+        <div>
+          <label class="label-mono" for="bulan">Periode</label>
+          <input class="input mt-1.5" id="bulan" name="bulan" type="month" value="<%= bulan %>">
+        </div>
+        <button type="submit" class="btn btn-secondary btn-sm">Lihat</button>
+      </form>
+    </div>
+
+    <div class="card-flat overflow-hidden">
+      <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+        <h2 class="text-[18px]">Daftar Pengeluaran</h2>
+        <span class="label-mono"><%= pagination.total %> catatan</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table-base">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Kategori</th>
+              <th>Keterangan</th>
+              <th class="text-right">Jumlah</th>
+              <th class="w-[70px]"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!expenses.length) { %>
+            <tr>
+              <td colspan="5" class="py-10 text-center text-ash">Belum ada pengeluaran pada periode ini.</td>
+            </tr>
+            <% } %>
+            <% expenses.forEach(function (expense) { %>
+            <tr>
+              <td class="font-mono text-[12px] text-ash"><%= formatTanggal(expense.tanggal) %></td>
+              <td><span class="badge bg-canvas text-body"><%= expense.kategori %></span></td>
+              <td class="text-[14px]"><%= expense.keterangan || '-' %></td>
+              <td class="text-right font-mono text-[13px] text-danger"><%= formatRupiah(expense.jumlah) %></td>
+              <td>
+                <form method="post" action="/expenses/<%= expense.id %>/delete" class="text-right">
+                  <button type="submit" class="btn btn-ghost btn-sm text-danger" data-confirm="Hapus pengeluaran ini?">Hapus</button>
+                </form>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <%- include('../partials/pagination') %>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

@@ -1,0 +1,12 @@
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <% if (typeof pageScripts !== 'undefined' && pageScripts) { %>
+  <% pageScripts.forEach(function (src) { %>
+  <script src="<%= src %>"></script>
+  <% }); %>
+  <% } %>
+</body>
+</html>

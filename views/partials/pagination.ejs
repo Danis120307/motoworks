@@ -1,0 +1,21 @@
+<% if (typeof pagination !== 'undefined' && pagination && pagination.totalPages > 1) { %>
+<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+  <p class="font-mono text-[11px] tracking-wider text-mute uppercase">
+    Menampilkan <%= pagination.from %>-<%= pagination.to %> dari <%= pagination.total %>
+  </p>
+  <div class="flex items-center gap-2">
+    <%
+    const pageUrl = (p) => {
+      const u = new URLSearchParams(query);
+      u.set('page', p);
+      return currentPath + '?' + u.toString();
+    };
+    %>
+    <a href="<%= pageUrl(pagination.page - 1) %>"
+      class="btn btn-secondary btn-sm <%= pagination.hasPrev ? '' : 'pointer-events-none opacity-40' %>">Sebelumnya</a>
+    <span class="font-mono text-[12px] text-ash"><%= pagination.page %> / <%= pagination.totalPages %></span>
+    <a href="<%= pageUrl(pagination.page + 1) %>"
+      class="btn btn-secondary btn-sm <%= pagination.hasNext ? '' : 'pointer-events-none opacity-40' %>">Berikutnya</a>
+  </div>
+</div>
+<% } %>

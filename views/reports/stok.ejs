@@ -1,0 +1,176 @@
+<%- include('../partials/head') %>
+
+<%
+const label = period.period === 'harian'
+  ? formatHariLengkap(period.start)
+  : period.period === 'bulanan'
+    ? formatBulan(period.start)
+    : period.period === 'tahunan'
+      ? 'Tahun ' + period.tahun
+      : formatTanggal(period.start) + ' - ' + formatTanggal(period.end);
+%>
+
+<div class="card">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h2 class="text-[18px]">Laporan Stok</h2>
+      <p class="mt-1 text-[14px] text-ash">
+        Nilai stok terkini · item terlaris periode <span class="text-body"><%= label %></span>
+      </p>
+    </div>
+    <%- include('partials/period-filter', { period, action: '/reports/stok' }) %>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="card">
+    <p class="label-mono">Nilai Stok (Beli)</p>
+    <p class="stat-value mt-3"><%= formatRupiah(stock.nilaiStok) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Potensi Nilai Jual</p>
+    <p class="stat-value mt-3 text-info"><%= formatRupiah(stock.nilaiJual) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Potensi Margin</p>
+    <p class="stat-value mt-3 text-success"><%= formatRupiah(stock.potensiMargin) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Total Item / Unit</p>
+    <p class="stat-value mt-3"><%= stock.totalItem %> <span class="text-[14px] text-ash">/ <%= formatAngka(stock.totalQty) %> unit</span></p>
+  </div>
+</div>
+
+<% if (stock.menipis.length) { %>
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+    <h2 class="text-[18px]">Stok Menipis</h2>
+    <span class="label-mono text-warning"><%= stock.menipis.length %> item</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>Nama</th>
+          <th>Kategori</th>
+          <th class="text-right">Stok</th>
+          <th class="text-right">Minimum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% stock.menipis.forEach(function (part) { %>
+        <tr>
+          <td class="font-mono text-[13px] text-ink"><%= part.kodeItem %></td>
+          <td class="text-ink"><%= part.nama %></td>
+          <td class="text-[14px]"><%= part.category ? part.category.namaKategori : '-' %></td>
+          <td class="text-right font-mono text-[13px] text-danger"><%= part.stokSaatIni %></td>
+          <td class="text-right font-mono text-[13px]"><%= part.stokMinimum %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% } %>
+
+<div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+  <div class="card-flat overflow-hidden">
+    <div class="border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Sparepart Terlaris</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Sparepart</th>
+            <th class="text-right">Qty Terjual</th>
+            <th class="text-right">Nilai</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!top.spareparts.length) { %>
+          <tr><td colspan="3" class="py-8 text-center text-ash">Belum ada penjualan sparepart.</td></tr>
+          <% } %>
+          <% top.spareparts.forEach(function (item) { %>
+          <tr>
+            <td>
+              <p class="text-ink"><%= item.nama %></p>
+              <p class="font-mono text-[11px] text-ash"><%= item.kode %></p>
+            </td>
+            <td class="text-right font-mono text-[13px]"><%= item.qty %></td>
+            <td class="text-right font-mono text-[13px] text-ink"><%= formatRupiah(item.subtotal) %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card-flat overflow-hidden">
+    <div class="border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Jasa Terlaris</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Layanan</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Nilai</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!top.jasa.length) { %>
+          <tr><td colspan="3" class="py-8 text-center text-ash">Belum ada jasa pada periode ini.</td></tr>
+          <% } %>
+          <% top.jasa.forEach(function (item) { %>
+          <tr>
+            <td class="text-ink"><%= item.nama %></td>
+            <td class="text-right font-mono text-[13px]"><%= item.qty %></td>
+            <td class="text-right font-mono text-[13px] text-ink"><%= formatRupiah(item.subtotal) %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="border-b border-hairline px-5 py-4">
+    <h2 class="text-[18px]">Nilai Stok per Item</h2>
+  </div>
+  <div class="max-h-[520px] overflow-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>Nama</th>
+          <th class="text-right">Stok</th>
+          <th class="text-right">Harga Beli</th>
+          <th class="text-right">Nilai Stok</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% stock.parts.forEach(function (part) { %>
+        <tr>
+          <td class="font-mono text-[13px] text-ink"><%= part.kodeItem %></td>
+          <td class="text-ink"><%= part.nama %></td>
+          <td class="text-right font-mono text-[13px]"><%= part.stokSaatIni %></td>
+          <td class="text-right font-mono text-[13px]"><%= formatRupiah(part.hargaBeli) %></td>
+          <td class="text-right font-mono text-[13px] text-ink"><%= formatRupiah(part.stokSaatIni * part.hargaBeli) %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+      <tfoot>
+        <tr class="border-t border-hairline-strong">
+          <td colspan="4" class="label-mono text-right">Total nilai stok</td>
+          <td class="text-right font-mono text-[15px] text-ink"><%= formatRupiah(stock.nilaiStok) %></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

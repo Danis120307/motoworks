@@ -1,0 +1,148 @@
+<%- include('../partials/head') %>
+
+<%
+const label = period.period === 'harian'
+  ? formatHariLengkap(period.start)
+  : period.period === 'bulanan'
+    ? formatBulan(period.start)
+    : period.period === 'tahunan'
+      ? 'Tahun ' + period.tahun
+      : formatTanggal(period.start) + ' - ' + formatTanggal(period.end);
+const keyLabel = (key) => key.length === 7 ? formatBulan(key + '-01T00:00:00') : formatTanggal(key + 'T00:00:00');
+%>
+
+<div class="card">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h2 class="text-[18px]">Laporan Laba Rugi</h2>
+      <p class="mt-1 text-[14px] text-ash">Periode: <span class="text-body"><%= label %></span></p>
+    </div>
+    <%- include('partials/period-filter', { period, action: '/reports/laba-rugi' }) %>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <div class="card">
+    <p class="label-mono">Total Pendapatan</p>
+    <p class="stat-value mt-3 text-success"><%= formatRupiah(report.totalPendapatan) %></p>
+    <p class="mt-1 text-[13px] text-ash"><%= report.payments.length %> pembayaran</p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Total Pengeluaran</p>
+    <p class="stat-value mt-3 text-danger"><%= formatRupiah(report.totalPengeluaran) %></p>
+    <p class="mt-1 text-[13px] text-ash"><%= report.expenses.length %> catatan</p>
+  </div>
+  <div class="card <%= report.labaBersih >= 0 ? 'border-success/30' : 'border-danger/30' %>">
+    <p class="label-mono">Laba Bersih</p>
+    <p class="stat-value mt-3 <%= report.labaBersih >= 0 ? 'text-success' : 'text-danger' %>">
+      <%= formatRupiah(report.labaBersih) %>
+    </p>
+    <p class="mt-1 text-[13px] text-ash">Pendapatan − pengeluaran</p>
+  </div>
+</div>
+
+<div class="card-flat mt-6 overflow-hidden">
+  <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+    <h2 class="text-[18px]">Rekap <%= report.groupByMonth ? 'Per Bulan' : 'Per Hari' %></h2>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Periode</th>
+          <th class="text-right">Pendapatan</th>
+          <th class="text-right">Pengeluaran</th>
+          <th class="text-right">Selisih</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!report.breakdown.length) { %>
+        <tr>
+          <td colspan="4" class="py-10 text-center text-ash">Tidak ada transaksi pada periode ini.</td>
+        </tr>
+        <% } %>
+        <% report.breakdown.forEach(function (row) { %>
+        <tr>
+          <td class="font-mono text-[13px] text-ink"><%= keyLabel(row.key) %></td>
+          <td class="text-right font-mono text-[13px] text-success"><%= formatRupiah(row.pendapatan) %></td>
+          <td class="text-right font-mono text-[13px] text-danger"><%= formatRupiah(row.pengeluaran) %></td>
+          <td class="text-right font-mono text-[13px] <%= row.selisih >= 0 ? 'text-ink' : 'text-danger' %>">
+            <%= formatRupiah(row.selisih) %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+  <div class="card-flat overflow-hidden">
+    <div class="border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Detail Pendapatan</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Order</th>
+            <th class="text-right">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!report.payments.length) { %>
+          <tr><td colspan="3" class="py-8 text-center text-ash">Tidak ada pendapatan.</td></tr>
+          <% } %>
+          <% report.payments.forEach(function (payment) { %>
+          <tr>
+            <td class="font-mono text-[12px] text-ash"><%= formatTanggal(payment.tanggalBayar) %></td>
+            <td>
+              <p class="font-mono text-[12px] text-ink"><%= payment.serviceOrder ? payment.serviceOrder.nomorOrder : '-' %></p>
+              <p class="text-[13px] text-ash">
+                <%= payment.serviceOrder && payment.serviceOrder.customer && payment.serviceOrder.customer.nama
+                  ? payment.serviceOrder.customer.nama : 'Tanpa nama' %>
+              </p>
+            </td>
+            <td class="text-right font-mono text-[13px] text-success"><%= formatRupiah(payment.jumlahBayar) %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card-flat overflow-hidden">
+    <div class="border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Detail Pengeluaran</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Kategori</th>
+            <th class="text-right">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!report.expenses.length) { %>
+          <tr><td colspan="3" class="py-8 text-center text-ash">Tidak ada pengeluaran.</td></tr>
+          <% } %>
+          <% report.expenses.forEach(function (expense) { %>
+          <tr>
+            <td class="font-mono text-[12px] text-ash"><%= formatTanggal(expense.tanggal) %></td>
+            <td>
+              <p class="text-[14px] text-ink"><%= expense.kategori %></p>
+              <% if (expense.keterangan) { %><p class="text-[13px] text-ash"><%= expense.keterangan %></p><% } %>
+            </td>
+            <td class="text-right font-mono text-[13px] text-danger"><%= formatRupiah(expense.jumlah) %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

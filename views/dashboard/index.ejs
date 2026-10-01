@@ -1,0 +1,153 @@
+<%- include('../partials/head') %>
+
+<%
+const chart30Empty = [...chart30.pendapatan, ...chart30.pengeluaran].every((v) => !v);
+const chartBulananEmpty = [...chartBulanan.pendapatan, ...chartBulanan.pengeluaran].every((v) => !v);
+%>
+
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="card">
+    <p class="label-mono">Pendapatan Hari Ini</p>
+    <p class="stat-value mt-3"><%= formatRupiah(pendapatanHariIni) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Pendapatan Bulan Ini</p>
+    <p class="stat-value mt-3 text-success"><%= formatRupiah(pendapatanBulanIni) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Pengeluaran Bulan Ini</p>
+    <p class="stat-value mt-3 text-danger"><%= formatRupiah(pengeluaranBulanIni) %></p>
+  </div>
+  <div class="card">
+    <p class="label-mono">Laba Bulan Ini</p>
+    <p class="stat-value mt-3 <%= labaBulanIni >= 0 ? 'text-ink' : 'text-danger' %>">
+      <%= formatRupiah(labaBulanIni) %>
+    </p>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-3">
+  <div class="card xl:col-span-2">
+    <div class="mb-4 flex items-center justify-between">
+      <div>
+        <h2 class="text-[18px]">Pendapatan vs Pengeluaran</h2>
+        <p class="label-mono mt-1">30 hari terakhir</p>
+      </div>
+    </div>
+    <% if (chart30Empty) { %>
+    <div class="flex h-[280px] flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-hairline-strong px-6 text-center">
+      <%- include('../partials/icon', { name: 'reports', className: 'h-8 w-8 text-mute' }) %>
+      <div>
+        <p class="text-[15px] text-ink">Belum ada data 30 hari terakhir</p>
+        <p class="mt-1 text-[13px] text-ash">Grafik akan terisi otomatis setelah ada pembayaran order atau pengeluaran yang dicatat.</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2">
+        <a href="/orders/new" class="btn btn-primary btn-sm">Buat Order</a>
+        <a href="/expenses" class="btn btn-secondary btn-sm">Catat Pengeluaran</a>
+      </div>
+    </div>
+    <% } else { %>
+    <div class="h-[280px]">
+      <canvas id="chart30"></canvas>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="space-y-4">
+    <div class="card">
+      <div class="flex items-center justify-between">
+        <h2 class="text-[18px]">Perlu Perhatian</h2>
+        <a href="/stock" class="link text-[13px]">Kelola stok</a>
+      </div>
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center justify-between rounded-sm border border-hairline bg-canvas px-4 py-3">
+          <div>
+            <p class="text-[14px] text-ink">Stok menipis</p>
+            <p class="font-mono text-[11px] text-mute uppercase">item di bawah minimum</p>
+          </div>
+          <span class="badge <%= lowStock > 0 ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success' %>">
+            <%= lowStock %>
+          </span>
+        </div>
+        <div class="flex items-center justify-between rounded-sm border border-hairline bg-canvas px-4 py-3">
+          <div>
+            <p class="text-[14px] text-ink">Order aktif</p>
+            <p class="font-mono text-[11px] text-mute uppercase">menunggu / dikerjakan</p>
+          </div>
+          <span class="badge bg-info/15 text-info"><%= orderAktif %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="text-[18px]">Item Terlaris Bulan Ini</h2>
+      <div class="mt-4 space-y-3">
+        <% if (!topItems.spareparts.length && !topItems.jasa.length) { %>
+        <p class="text-[14px] text-ash">Belum ada penjualan bulan ini.</p>
+        <% } %>
+        <% topItems.spareparts.forEach(function (item) { %>
+        <div class="flex items-center justify-between gap-3">
+          <p class="truncate text-[14px] text-body"><%= item.nama %></p>
+          <span class="font-mono text-[12px] text-ink"><%= item.qty %>x</span>
+        </div>
+        <% }); %>
+        <% topItems.jasa.forEach(function (item) { %>
+        <div class="flex items-center justify-between gap-3">
+          <p class="truncate text-[14px] text-body"><%= item.nama %></p>
+          <span class="font-mono text-[12px] text-info"><%= item.qty %>x jasa</span>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-3">
+  <div class="card xl:col-span-2">
+    <h2 class="text-[18px]">Tren Bulanan <%= new Date().getFullYear() %></h2>
+    <% if (chartBulananEmpty) { %>
+    <div class="mt-4 flex h-[240px] flex-col items-center justify-center gap-3 rounded-sm border border-dashed border-hairline-strong px-6 text-center">
+      <%- include('../partials/icon', { name: 'reports', className: 'h-8 w-8 text-mute' }) %>
+      <div>
+        <p class="text-[15px] text-ink">Belum ada data tahun <%= new Date().getFullYear() %></p>
+        <p class="mt-1 text-[13px] text-ash">Grafik akan terisi otomatis setelah ada pembayaran order atau pengeluaran yang dicatat.</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2">
+        <a href="/orders/new" class="btn btn-primary btn-sm">Buat Order</a>
+        <a href="/expenses" class="btn btn-secondary btn-sm">Catat Pengeluaran</a>
+      </div>
+    </div>
+    <% } else { %>
+    <div class="mt-4 h-[240px]">
+      <canvas id="chartBulanan"></canvas>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]">Order Terbaru</h2>
+      <a href="/orders" class="link text-[13px]">Lihat semua</a>
+    </div>
+    <div class="mt-4 space-y-3">
+      <% if (!recentOrders.length) { %>
+      <p class="text-[14px] text-ash">Belum ada order.</p>
+      <% } %>
+      <% recentOrders.forEach(function (order) { %>
+      <a href="/orders/<%= order.id %>" class="flex items-center justify-between gap-3 rounded-sm border border-hairline bg-canvas px-4 py-3 transition-colors hover:border-secondary">
+        <div class="min-w-0">
+          <p class="truncate font-mono text-[12px] text-ink"><%= order.nomorOrder %></p>
+          <p class="truncate text-[13px] text-ash"><%= order.customer && order.customer.nama ? order.customer.nama : 'Tanpa nama' %></p>
+        </div>
+        <span class="badge <%= statusBadgeClass(order.statusOrder) %>"><%= statusLabel(order.statusOrder) %></span>
+      </a>
+      <% }); %>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.__CHART__ = <%- JSON.stringify({ chart30, chartBulanan }) %>;
+</script>
+
+<%- include('../partials/foot', { pageScripts: ['/vendor/chartjs/chart.umd.js', '/js/dashboard.js'] }) %>

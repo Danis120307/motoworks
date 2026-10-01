@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masuk · Motoworks</title>
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="flex min-h-[100dvh] items-center justify-center px-4 py-10">
+  <div class="w-full max-w-sm">
+    <div class="mb-8">
+      <div class="mb-6 h-1 w-full rounded-full bg-gradient-to-r from-hero-warm via-hero-glow to-hero-pink"></div>
+      <p class="font-mono text-[12px] font-semibold tracking-[0.3em] text-primary uppercase">Motoworks</p>
+      <h1 class="mt-2 text-[28px] leading-tight">Sistem Manajemen Bengkel</h1>
+      <p class="mt-2 text-[14px] text-ash">Kelola stok sparepart, order service, dan laporan keuangan dalam satu tempat.</p>
+    </div>
+
+    <form method="post" action="/login" class="card space-y-5">
+      <% if (error) { %>
+      <div class="rounded-md border border-danger/20 border-l-[3px] border-l-danger bg-danger/10 px-4 py-3 text-[14px] text-danger">
+        <%= error %>
+      </div>
+      <% } %>
+
+      <div>
+        <label class="label-mono" for="email">Email</label>
+        <input class="input mt-1.5" type="email" id="email" name="email" value="<%= values.email || '' %>"
+          placeholder="owner@motoworks.local" required autofocus>
+      </div>
+
+      <div>
+        <label class="label-mono" for="password">Password</label>
+        <input class="input mt-1.5" type="password" id="password" name="password" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-full">Masuk</button>
+    </form>
+
+    <p class="mt-6 text-center font-mono text-[11px] tracking-wider text-mute uppercase">
+      Single user · Owner
+    </p>
+  </div>
+</body>
+</html>

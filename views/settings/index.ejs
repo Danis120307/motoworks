@@ -1,0 +1,90 @@
+<%- include('../partials/head') %>
+
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+  <div class="card">
+    <h2 class="text-[18px]">Profil Bengkel</h2>
+    <p class="mt-1 text-[14px] text-ash">Data ini tampil pada nota/invoice.</p>
+
+    <form method="post" action="/settings" class="mt-5 space-y-4">
+      <div>
+        <label class="label-mono" for="namaBengkel">Nama Bengkel</label>
+        <input class="input mt-1.5" id="namaBengkel" name="namaBengkel" value="<%= values.namaBengkel || '' %>" required>
+        <% if (errors.namaBengkel) { %><p class="error-text"><%= errors.namaBengkel[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="alamat">Alamat</label>
+        <textarea class="input mt-1.5" id="alamat" name="alamat" rows="2"><%= values.alamat || '' %></textarea>
+        <% if (errors.alamat) { %><p class="error-text"><%= errors.alamat[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="telepon">Telepon</label>
+        <input class="input mt-1.5" id="telepon" name="telepon" value="<%= values.telepon || '' %>">
+        <% if (errors.telepon) { %><p class="error-text"><%= errors.telepon[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="footerNota">Catatan Kaki Nota</label>
+        <input class="input mt-1.5" id="footerNota" name="footerNota" value="<%= values.footerNota || '' %>"
+          placeholder="cth. Garansi jasa 7 hari">
+        <% if (errors.footerNota) { %><p class="error-text"><%= errors.footerNota[0] %></p><% } %>
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan Profil</button>
+    </form>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card">
+      <h2 class="text-[18px]">Akun Owner</h2>
+      <div class="mt-4 space-y-2">
+        <div class="flex items-center justify-between text-[14px]">
+          <span class="text-ash">Nama</span>
+          <span class="text-body"><%= user.nama %></span>
+        </div>
+        <div class="flex items-center justify-between text-[14px]">
+          <span class="text-ash">Email</span>
+          <span class="font-mono text-[13px] text-body"><%= user.email %></span>
+        </div>
+        <div class="flex items-center justify-between text-[14px]">
+          <span class="text-ash">Role</span>
+          <span class="badge bg-secondary/15 text-info"><%= user.role %></span>
+        </div>
+      </div>
+      <p class="mt-4 text-[13px] text-ash">
+        Role lain (kasir/mekanik) dapat ditambahkan pada pengembangan berikutnya.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2 class="text-[18px]">Ganti Password</h2>
+      <form method="post" action="/settings/password" class="mt-4 space-y-4">
+        <div>
+          <label class="label-mono" for="oldPassword">Password Lama</label>
+          <input class="input mt-1.5" id="oldPassword" name="oldPassword" type="password" required>
+          <% if (errors.oldPassword) { %><p class="error-text"><%= errors.oldPassword[0] %></p><% } %>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label-mono" for="newPassword">Password Baru</label>
+            <input class="input mt-1.5" id="newPassword" name="newPassword" type="password" required>
+            <% if (errors.newPassword) { %><p class="error-text"><%= errors.newPassword[0] %></p><% } %>
+          </div>
+          <div>
+            <label class="label-mono" for="confirmPassword">Konfirmasi</label>
+            <input class="input mt-1.5" id="confirmPassword" name="confirmPassword" type="password" required>
+            <% if (errors.confirmPassword) { %><p class="error-text"><%= errors.confirmPassword[0] %></p><% } %>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-secondary">Ganti Password</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="text-[18px]">Backup Data</h2>
+      <p class="mt-1 text-[14px] text-ash">
+        Unduh salinan database saat ini. Simpan file backup di tempat aman secara berkala.
+      </p>
+      <a href="/settings/backup" class="btn btn-primary mt-4">Unduh Backup Database</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

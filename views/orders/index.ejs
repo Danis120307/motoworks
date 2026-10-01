@@ -1,0 +1,86 @@
+<%- include('../partials/head') %>
+
+<div class="card-flat overflow-hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3 border-b border-hairline px-5 py-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <h2 class="text-[18px]">Daftar Order Service</h2>
+      <span class="label-mono"><%= pagination.total %> order</span>
+    </div>
+    <a href="/orders/new" class="btn btn-primary btn-sm">
+      <%- include('../partials/icon', { name: 'plus', className: 'h-4 w-4' }) %> Buat Order
+    </a>
+  </div>
+
+  <div class="border-b border-hairline px-5 py-4">
+    <form method="get" action="/orders" class="flex flex-wrap items-end gap-3">
+      <div class="min-w-[200px] flex-1">
+        <label class="label-mono" for="q">Cari</label>
+        <input class="input mt-1.5" id="q" name="q" value="<%= filters.q %>" placeholder="Nomor order, nama, plat">
+      </div>
+      <div class="min-w-[160px]">
+        <label class="label-mono" for="status">Status</label>
+        <select class="input mt-1.5" id="status" name="status">
+          <option value="">Semua status</option>
+          <% ORDER_STATUSES.forEach(function (status) { %>
+          <option value="<%= status %>" <%= filters.status === status ? 'selected' : '' %>><%= statusLabel(status) %></option>
+          <% }); %>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-secondary btn-sm">Terapkan</button>
+      <a href="/orders" class="btn btn-ghost btn-sm">Reset</a>
+    </form>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="table-base">
+      <thead>
+        <tr>
+          <th>Nomor</th>
+          <th>Tanggal</th>
+          <th>Pelanggan</th>
+          <th class="text-right">Item</th>
+          <th class="text-right">Total</th>
+          <th class="text-right">Dibayar</th>
+          <th>Status</th>
+          <th class="text-right">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!orders.length) { %>
+        <tr>
+          <td colspan="8" class="py-10 text-center text-ash">Belum ada order service.</td>
+        </tr>
+        <% } %>
+        <% orders.forEach(function (order) {
+          const bayar = order.payments.reduce(function (acc, p) { return acc + p.jumlahBayar; }, 0);
+        %>
+        <tr>
+          <td class="font-mono text-[12px] text-ink"><%= order.nomorOrder %></td>
+          <td class="font-mono text-[12px] text-ash"><%= formatTanggal(order.tanggalMasuk) %></td>
+          <td>
+            <p class="text-ink"><%= order.customer && order.customer.nama ? order.customer.nama : 'Tanpa nama' %></p>
+            <% if (order.customer && order.customer.platMotor) { %>
+            <p class="font-mono text-[11px] text-ash"><%= order.customer.platMotor %></p>
+            <% } %>
+          </td>
+          <td class="text-right font-mono text-[13px]"><%= order._count.items %></td>
+          <td class="text-right font-mono text-[13px] text-ink"><%= formatRupiah(order.totalKeseluruhan) %></td>
+          <td class="text-right font-mono text-[13px] <%= bayar >= order.totalKeseluruhan && order.totalKeseluruhan > 0 ? 'text-success' : 'text-body' %>">
+            <%= formatRupiah(bayar) %>
+          </td>
+          <td><span class="badge <%= statusBadgeClass(order.statusOrder) %>"><%= statusLabel(order.statusOrder) %></span></td>
+          <td>
+            <div class="flex justify-end gap-2">
+              <a href="/orders/<%= order.id %>" class="btn btn-secondary btn-sm">Detail</a>
+              <a href="/orders/<%= order.id %>/invoice" class="btn btn-ghost btn-sm">Nota</a>
+            </div>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/pagination') %>
+<%- include('../partials/foot') %>

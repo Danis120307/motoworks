@@ -1,0 +1,101 @@
+<%- include('../../partials/head') %>
+
+<div class="mx-auto max-w-2xl">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]"><%= part ? 'Edit Sparepart' : 'Tambah Sparepart' %></h2>
+      <a href="/spareparts" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+
+    <form method="post" action="<%= part ? '/spareparts/' + part.id + '/update' : '/spareparts' %>"
+      class="mt-5 space-y-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+          <label class="label-mono" for="kodeItem">Kode Item</label>
+          <input class="input mt-1.5 font-mono" id="kodeItem" name="kodeItem" value="<%= values.kodeItem || '' %>"
+            placeholder="OLI-YAM-01" required>
+          <% if (errors.kodeItem) { %><p class="error-text"><%= errors.kodeItem[0] %></p><% } %>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="label-mono" for="nama">Nama Sparepart</label>
+          <input class="input mt-1.5" id="nama" name="nama" value="<%= values.nama || '' %>" required>
+          <% if (errors.nama) { %><p class="error-text"><%= errors.nama[0] %></p><% } %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="label-mono" for="categoryId">Kategori</label>
+          <select class="input mt-1.5" id="categoryId" name="categoryId">
+            <option value="">Tanpa kategori</option>
+            <% categories.forEach(function (category) { %>
+            <option value="<%= category.id %>" <%= String(values.categoryId || '') === String(category.id) ? 'selected' : '' %>>
+              <%= category.namaKategori %>
+            </option>
+            <% }); %>
+          </select>
+          <% if (errors.categoryId) { %><p class="error-text"><%= errors.categoryId[0] %></p><% } %>
+        </div>
+        <div>
+          <label class="label-mono" for="satuan">Satuan</label>
+          <input class="input mt-1.5" id="satuan" name="satuan" value="<%= values.satuan || '' %>"
+            placeholder="pcs / botol / set">
+          <% if (errors.satuan) { %><p class="error-text"><%= errors.satuan[0] %></p><% } %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+          <label class="label-mono" for="hargaBeli">Harga Beli (Rp)</label>
+          <input class="input mt-1.5" id="hargaBeli" name="hargaBeli" type="number" min="0" step="1"
+            value="<%= values.hargaBeli !== undefined ? values.hargaBeli : '' %>" required>
+          <% if (errors.hargaBeli) { %><p class="error-text"><%= errors.hargaBeli[0] %></p><% } %>
+        </div>
+        <div>
+          <label class="label-mono" for="hargaJual">Harga Jual (Rp)</label>
+          <input class="input mt-1.5" id="hargaJual" name="hargaJual" type="number" min="0" step="1"
+            value="<%= values.hargaJual !== undefined ? values.hargaJual : '' %>" required>
+          <% if (errors.hargaJual) { %><p class="error-text"><%= errors.hargaJual[0] %></p><% } %>
+        </div>
+        <div>
+          <label class="label-mono" for="stokMinimum">Stok Minimum</label>
+          <input class="input mt-1.5" id="stokMinimum" name="stokMinimum" type="number" min="0" step="1"
+            value="<%= values.stokMinimum !== undefined ? values.stokMinimum : 5 %>" required>
+          <% if (errors.stokMinimum) { %><p class="error-text"><%= errors.stokMinimum[0] %></p><% } %>
+        </div>
+      </div>
+
+      <% if (!part) { %>
+      <div class="rounded-md border border-hairline bg-canvas p-4">
+        <label class="label-mono" for="stokAwal">Stok Awal</label>
+        <input class="input mt-1.5 max-w-[200px]" id="stokAwal" name="stokAwal" type="number" min="0" step="1"
+          value="<%= values.stokAwal !== undefined ? values.stokAwal : 0 %>">
+        <p class="mt-2 text-[13px] text-ash">
+          Jumlah stok awal akan dicatat sebagai mutasi stok masuk. Perubahan stok berikutnya lewat menu Stok.
+        </p>
+        <% if (errors.stokAwal) { %><p class="error-text"><%= errors.stokAwal[0] %></p><% } %>
+      </div>
+      <% } else { %>
+      <div class="flex flex-wrap items-center justify-between gap-3 rounded-md border border-hairline bg-canvas px-4 py-3">
+        <div>
+          <p class="label-mono">Stok Saat Ini</p>
+          <p class="stat-value mt-1 <%= part.stokSaatIni <= part.stokMinimum ? 'text-danger' : '' %>">
+            <%= part.stokSaatIni %> <span class="text-[13px] text-ash"><%= part.satuan || '' %></span>
+          </p>
+        </div>
+        <a href="/spareparts/<%= part.id %>/kartu-stok" class="btn btn-secondary btn-sm">Lihat Kartu Stok</a>
+      </div>
+      <% } %>
+
+      <button type="submit" class="btn btn-primary">Simpan</button>
+    </form>
+
+    <% if (part) { %>
+    <form method="post" action="/spareparts/<%= part.id %>/delete" class="mt-5 border-t border-hairline pt-5">
+      <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus sparepart ini?">Hapus Sparepart</button>
+    </form>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

@@ -1,0 +1,35 @@
+<%- include('../../partials/head') %>
+
+<div class="mx-auto max-w-lg">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]">Edit Supplier</h2>
+      <a href="/suppliers" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+
+    <form method="post" action="/suppliers/<%= supplier.id %>/update" class="mt-5 space-y-4">
+      <div>
+        <label class="label-mono" for="nama">Nama Supplier</label>
+        <input class="input mt-1.5" id="nama" name="nama" value="<%= values.nama || '' %>" required>
+        <% if (errors.nama) { %><p class="error-text"><%= errors.nama[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="kontak">Kontak</label>
+        <input class="input mt-1.5" id="kontak" name="kontak" value="<%= values.kontak || '' %>">
+        <% if (errors.kontak) { %><p class="error-text"><%= errors.kontak[0] %></p><% } %>
+      </div>
+      <div>
+        <label class="label-mono" for="alamat">Alamat</label>
+        <textarea class="input mt-1.5" id="alamat" name="alamat" rows="2"><%= values.alamat || '' %></textarea>
+        <% if (errors.alamat) { %><p class="error-text"><%= errors.alamat[0] %></p><% } %>
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </form>
+
+    <form method="post" action="/suppliers/<%= supplier.id %>/delete" class="mt-5 border-t border-hairline pt-5">
+      <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus supplier ini?">Hapus Supplier</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

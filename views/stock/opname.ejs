@@ -1,0 +1,58 @@
+<%- include('../partials/head') %>
+
+<form method="post" action="/stock/opname" class="space-y-6">
+  <div class="card flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h2 class="text-[18px]">Stok Opname</h2>
+      <p class="mt-1 text-[14px] text-ash">
+        Masukkan jumlah fisik hasil hitung. Hanya baris yang berubah yang dicatat sebagai penyesuaian.
+      </p>
+    </div>
+    <div class="flex items-end gap-3">
+      <div>
+        <label class="label-mono" for="tanggal">Tanggal</label>
+        <input class="input mt-1.5" id="tanggal" name="tanggal" type="date" value="<%= values.tanggal %>" required>
+      </div>
+      <a href="/stock" class="btn btn-ghost">Batal</a>
+      <button type="submit" class="btn btn-primary">Simpan Opname</button>
+    </div>
+  </div>
+
+  <div class="card-flat overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Kode</th>
+            <th>Nama</th>
+            <th>Kategori</th>
+            <th class="text-right">Stok Sistem</th>
+            <th class="w-[160px] text-right">Stok Fisik</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!parts.length) { %>
+          <tr>
+            <td colspan="5" class="py-10 text-center text-ash">Belum ada sparepart.</td>
+          </tr>
+          <% } %>
+          <% parts.forEach(function (part) { %>
+          <tr>
+            <td class="font-mono text-[13px] text-ink"><%= part.kodeItem %></td>
+            <td class="text-ink"><%= part.nama %></td>
+            <td class="text-[14px]"><%= part.category ? part.category.namaKategori : '-' %></td>
+            <td class="text-right font-mono text-[13px]"><%= part.stokSaatIni %></td>
+            <td>
+              <input type="hidden" name="sparePartId" value="<%= part.id %>">
+              <input class="input h-9 text-right font-mono" name="stokFisik" type="number" min="0" step="1"
+                value="<%= part.stokSaatIni %>">
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</form>
+
+<%- include('../partials/foot') %>

@@ -1,0 +1,287 @@
+<%- include('../partials/head') %>
+
+<%
+const locked = order.statusOrder === 'dibayar' || order.statusOrder === 'dibatalkan';
+const bisaDiubah = !locked;
+%>
+
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+  <div class="space-y-6 xl:col-span-2">
+    <div class="card">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="label-mono">Nomor Order</p>
+          <p class="mt-1 font-mono text-[20px] text-ink"><%= order.nomorOrder %></p>
+          <p class="mt-1 text-[13px] text-ash">
+            Masuk <%= formatTanggalWaktu(order.tanggalMasuk) %> · dibuat oleh <%= order.user.nama %>
+          </p>
+        </div>
+        <span class="badge <%= statusBadgeClass(order.statusOrder) %>"><%= statusLabel(order.statusOrder) %></span>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <p class="label-mono">Pelanggan</p>
+          <p class="mt-1 text-[15px] text-ink">
+            <%= order.customer && order.customer.nama ? order.customer.nama : 'Tanpa nama' %>
+          </p>
+          <% if (order.customer && order.customer.noHp) { %>
+          <p class="font-mono text-[12px] text-ash"><%= order.customer.noHp %></p>
+          <% } %>
+        </div>
+        <div>
+          <p class="label-mono">Motor</p>
+          <p class="mt-1 text-[15px] text-ink"><%= order.customer && order.customer.modelMotor ? order.customer.modelMotor : '-' %></p>
+          <% if (order.customer && order.customer.platMotor) { %>
+          <p class="font-mono text-[12px] text-ash"><%= order.customer.platMotor %></p>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (order.keluhan) { %>
+      <div class="mt-5 rounded-md border border-hairline bg-canvas px-4 py-3">
+        <p class="label-mono">Keluhan / Pekerjaan</p>
+        <p class="mt-1 text-[14px] text-body"><%= order.keluhan %></p>
+      </div>
+      <% } %>
+
+      <% if (order.mekanik) { %>
+      <p class="mt-3 text-[13px] text-ash">Mekanik: <span class="text-body"><%= order.mekanik %></span></p>
+      <% } %>
+
+      <div class="mt-5 flex flex-wrap gap-2 border-t border-hairline pt-5">
+        <% if (order.statusOrder === 'menunggu') { %>
+        <form method="post" action="/orders/<%= order.id %>/status">
+          <input type="hidden" name="status" value="dikerjakan">
+          <button type="submit" class="btn btn-primary btn-sm">Mulai Kerjakan</button>
+        </form>
+        <% } %>
+        <% if (order.statusOrder === 'dikerjakan') { %>
+        <form method="post" action="/orders/<%= order.id %>/status">
+          <input type="hidden" name="status" value="selesai">
+          <button type="submit" class="btn btn-primary btn-sm">Tandai Selesai</button>
+        </form>
+        <% } %>
+        <% if (['menunggu', 'dikerjakan', 'selesai'].includes(order.statusOrder)) { %>
+        <form method="post" action="/orders/<%= order.id %>/status">
+          <input type="hidden" name="status" value="dibatalkan">
+          <button type="submit" class="btn btn-danger btn-sm"
+            data-confirm="Batalkan order ini? Stok sparepart akan dikembalikan.">Batalkan Order</button>
+        </form>
+        <% } %>
+        <a href="/orders/<%= order.id %>/invoice" class="btn btn-secondary btn-sm">
+          <%- include('../partials/icon', { name: 'print', className: 'h-4 w-4' }) %> Cetak Nota
+        </a>
+        <a href="/orders" class="btn btn-ghost btn-sm">Semua Order</a>
+      </div>
+    </div>
+
+    <div class="card-flat overflow-hidden">
+      <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+        <h2 class="text-[18px]">Item Order</h2>
+        <span class="label-mono"><%= order.items.length %> item</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table-base">
+          <thead>
+            <tr>
+              <th>Tipe</th>
+              <th>Item</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Harga</th>
+              <th class="text-right">Subtotal</th>
+              <% if (bisaDiubah) { %><th class="w-[70px]"></th><% } %>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!order.items.length) { %>
+            <tr>
+              <td colspan="<%= bisaDiubah ? 6 : 5 %>" class="py-10 text-center text-ash">
+                Belum ada item. Tambahkan sparepart atau jasa di bawah.
+              </td>
+            </tr>
+            <% } %>
+            <% order.items.forEach(function (item) { %>
+            <tr>
+              <td>
+                <span class="badge <%= item.tipeItem === 'sparepart' ? 'bg-info/15 text-info' : 'bg-primary/15 text-primary' %>">
+                  <%= item.tipeItem %>
+                </span>
+              </td>
+              <td>
+                <p class="text-ink">
+                  <%= item.tipeItem === 'sparepart' ? (item.sparePart ? item.sparePart.nama : '-') : (item.serviceType ? item.serviceType.namaLayanan : '-') %>
+                </p>
+                <% if (item.sparePart) { %>
+                <p class="font-mono text-[11px] text-ash"><%= item.sparePart.kodeItem %></p>
+                <% } %>
+              </td>
+              <td class="text-right font-mono text-[13px]"><%= item.qty %></td>
+              <td class="text-right font-mono text-[13px]"><%= formatRupiah(item.hargaSatuan) %></td>
+              <td class="text-right font-mono text-[13px] text-ink"><%= formatRupiah(item.subtotal) %></td>
+              <% if (bisaDiubah) { %>
+              <td>
+                <form method="post" action="/orders/<%= order.id %>/items/<%= item.id %>/delete" class="text-right">
+                  <button type="submit" class="btn btn-ghost btn-sm text-danger"
+                    data-confirm="Hapus item ini?">Hapus</button>
+                </form>
+              </td>
+              <% } %>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <% if (bisaDiubah) { %>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="card">
+        <h3 class="text-[16px]">Tambah Sparepart</h3>
+        <form method="post" action="/orders/<%= order.id %>/items" class="mt-4 space-y-3">
+          <input type="hidden" name="tipeItem" value="sparepart">
+          <div>
+            <label class="label-mono" for="sparePartId">Sparepart</label>
+            <select class="input mt-1.5" id="sparePartId" name="sparePartId" required>
+              <option value="">Pilih sparepart</option>
+              <% spareparts.forEach(function (part) { %>
+              <option value="<%= part.id %>" <%= part.stokSaatIni <= 0 ? 'disabled' : '' %>>
+                <%= part.nama %> · <%= formatRupiah(part.hargaJual) %> (stok <%= part.stokSaatIni %>)
+              </option>
+              <% }); %>
+            </select>
+          </div>
+          <div>
+            <label class="label-mono" for="qtySparepart">Qty</label>
+            <input class="input mt-1.5 font-mono" id="qtySparepart" name="qty" type="number" min="1" step="1" value="1" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-full">Tambah Sparepart</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3 class="text-[16px]">Tambah Jasa</h3>
+        <form method="post" action="/orders/<%= order.id %>/items" class="mt-4 space-y-3">
+          <input type="hidden" name="tipeItem" value="jasa">
+          <div>
+            <label class="label-mono" for="serviceTypeId">Jenis Layanan</label>
+            <select class="input mt-1.5" id="serviceTypeId" name="serviceTypeId" required>
+              <option value="">Pilih layanan</option>
+              <% serviceTypes.forEach(function (serviceType) { %>
+              <option value="<%= serviceType.id %>">
+                <%= serviceType.namaLayanan %> · <%= formatRupiah(serviceType.hargaJasa) %>
+              </option>
+              <% }); %>
+            </select>
+          </div>
+          <div>
+            <label class="label-mono" for="qtyJasa">Qty</label>
+            <input class="input mt-1.5 font-mono" id="qtyJasa" name="qty" type="number" min="1" step="1" value="1" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-full">Tambah Jasa</button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+
+    <div class="card-flat overflow-hidden">
+      <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+        <h2 class="text-[18px]">Pembayaran</h2>
+        <span class="label-mono"><%= order.payments.length %> transaksi</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table-base">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Metode</th>
+              <th class="text-right">Jumlah</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!order.payments.length) { %>
+            <tr>
+              <td colspan="3" class="py-8 text-center text-ash">Belum ada pembayaran.</td>
+            </tr>
+            <% } %>
+            <% order.payments.forEach(function (payment) { %>
+            <tr>
+              <td class="font-mono text-[12px] text-ash"><%= formatTanggalWaktu(payment.tanggalBayar) %></td>
+              <td class="text-[14px]"><%= payment.metodeBayar || 'Tunai' %></td>
+              <td class="text-right font-mono text-[13px] text-success"><%= formatRupiah(payment.jumlahBayar) %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card">
+      <h2 class="text-[18px]">Ringkasan Biaya</h2>
+      <div class="mt-4 space-y-3">
+        <div class="flex items-center justify-between text-[14px]">
+          <span class="text-ash">Total Jasa</span>
+          <span class="font-mono text-body"><%= formatRupiah(order.totalJasa) %></span>
+        </div>
+        <div class="flex items-center justify-between text-[14px]">
+          <span class="text-ash">Total Sparepart</span>
+          <span class="font-mono text-body"><%= formatRupiah(order.totalSparepart) %></span>
+        </div>
+        <div class="flex items-center justify-between border-t border-hairline pt-3">
+          <span class="text-[15px] text-ink">Total</span>
+          <span class="font-mono text-[17px] text-ink"><%= formatRupiah(order.totalKeseluruhan) %></span>
+        </div>
+        <div class="flex items-center justify-between text-[14px]">
+          <span class="text-ash">Sudah Dibayar</span>
+          <span class="font-mono text-success"><%= formatRupiah(sudahBayar) %></span>
+        </div>
+        <div class="flex items-center justify-between border-t border-hairline pt-3">
+          <span class="text-[15px] text-ink">Sisa Tagihan</span>
+          <span class="font-mono text-[17px] <%= sisa > 0 ? 'text-danger' : 'text-success' %>">
+            <%= formatRupiah(sisa) %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <% if (order.statusOrder === 'selesai' && sisa > 0) { %>
+    <div class="card">
+      <h2 class="text-[18px]">Catat Pembayaran</h2>
+      <form method="post" action="/orders/<%= order.id %>/payment" class="mt-4 space-y-3">
+        <div>
+          <label class="label-mono" for="jumlahBayar">Jumlah Bayar (Rp)</label>
+          <input class="input mt-1.5 font-mono" id="jumlahBayar" name="jumlahBayar" type="number" min="1" step="1"
+            value="<%= sisa %>" required>
+        </div>
+        <div>
+          <label class="label-mono" for="metodeBayar">Metode</label>
+          <select class="input mt-1.5" id="metodeBayar" name="metodeBayar">
+            <% PAYMENT_METHODS.forEach(function (method) { %>
+            <option value="<%= method %>"><%= method %></option>
+            <% }); %>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary w-full">Simpan Pembayaran</button>
+      </form>
+    </div>
+    <% } %>
+
+    <% if (order.statusOrder === 'dibayar') { %>
+    <div class="card border-success/30 bg-success/10">
+      <p class="font-mono text-[12px] tracking-wider text-success uppercase">Lunas</p>
+      <p class="mt-2 text-[15px] text-ink">Order sudah dibayar penuh.</p>
+    </div>
+    <% } %>
+
+    <% if (order.statusOrder === 'dibatalkan') { %>
+    <div class="card border-danger/30 bg-danger/10">
+      <p class="font-mono text-[12px] tracking-wider text-danger uppercase">Dibatalkan</p>
+      <p class="mt-2 text-[15px] text-ink">Order dibatalkan dan stok sudah dikembalikan.</p>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

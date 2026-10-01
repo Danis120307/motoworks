@@ -1,0 +1,55 @@
+<%- include('../partials/head') %>
+
+<div class="mx-auto max-w-xl">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]">Catat Stok Keluar</h2>
+      <a href="/stock" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+    <p class="mt-2 text-[14px] text-ash">
+      Untuk pemakaian di luar order service (penjualan langsung, pemakaian internal, barang rusak).
+    </p>
+
+    <% if (errors.form) { %>
+    <div class="mt-4 rounded-md border border-danger/20 border-l-[3px] border-l-danger bg-danger/10 px-4 py-3 text-[14px] text-danger">
+      <%= errors.form.join(' ') %>
+    </div>
+    <% } %>
+
+    <form method="post" action="/stock/keluar" class="mt-5 space-y-4">
+      <div>
+        <label class="label-mono" for="sparePartId">Sparepart</label>
+        <select class="input mt-1.5" id="sparePartId" name="sparePartId" required>
+          <option value="">Pilih sparepart</option>
+          <% parts.forEach(function (part) { %>
+          <option value="<%= part.id %>" <%= String(values.sparePartId) === String(part.id) ? 'selected' : '' %>>
+            <%= part.kodeItem %> · <%= part.nama %> (stok <%= part.stokSaatIni %>)
+          </option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="label-mono" for="qty">Jumlah</label>
+          <input class="input mt-1.5 font-mono" id="qty" name="qty" type="number" min="1" step="1"
+            value="<%= values.qty || 1 %>" required>
+        </div>
+        <div>
+          <label class="label-mono" for="tanggal">Tanggal</label>
+          <input class="input mt-1.5" id="tanggal" name="tanggal" type="date" value="<%= values.tanggal %>" required>
+        </div>
+      </div>
+
+      <div>
+        <label class="label-mono" for="keterangan">Keterangan</label>
+        <input class="input mt-1.5" id="keterangan" name="keterangan" value="<%= values.keterangan %>"
+          placeholder="cth. Penjualan langsung">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Simpan Stok Keluar</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/foot') %>

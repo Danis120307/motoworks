@@ -1,0 +1,59 @@
+<%- include('../../partials/head') %>
+
+<div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+  <div class="card h-fit xl:col-span-1">
+    <h2 class="text-[18px]">Tambah Kategori</h2>
+    <form method="post" action="/categories" class="mt-4 space-y-4">
+      <div>
+        <label class="label-mono" for="namaKategori">Nama Kategori</label>
+        <input class="input mt-1.5" id="namaKategori" name="namaKategori" value="<%= values.namaKategori || '' %>"
+          placeholder="cth. Oli &amp; Pelumas" required>
+        <% if (errors.namaKategori) { %>
+        <p class="error-text"><%= errors.namaKategori[0] %></p>
+        <% } %>
+      </div>
+      <button type="submit" class="btn btn-primary w-full">Simpan</button>
+    </form>
+  </div>
+
+  <div class="card-flat overflow-hidden xl:col-span-2">
+    <div class="flex items-center justify-between border-b border-hairline px-5 py-4">
+      <h2 class="text-[18px]">Daftar Kategori</h2>
+      <span class="label-mono"><%= categories.length %> kategori</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Sparepart</th>
+            <th class="text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!categories.length) { %>
+          <tr>
+            <td colspan="3" class="py-10 text-center text-ash">Belum ada kategori.</td>
+          </tr>
+          <% } %>
+          <% categories.forEach(function (category) { %>
+          <tr>
+            <td class="text-ink"><%= category.namaKategori %></td>
+            <td class="font-mono text-[13px]"><%= category._count.spareParts %></td>
+            <td>
+              <div class="flex justify-end gap-2">
+                <a href="/categories/<%= category.id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
+                <form method="post" action="/categories/<%= category.id %>/delete">
+                  <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus kategori ini?">Hapus</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

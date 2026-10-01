@@ -1,0 +1,214 @@
+@import 'tailwindcss';
+@source '../../views';
+@source '../../src';
+@source '../js';
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
+}
+
+@theme {
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --color-primary: #f36458;
+  --color-primary-strong: #d04236;
+  --color-secondary: #0052ef;
+  --color-canvas: #0b0b0b;
+  --color-surface: #212121;
+  --color-surface-deep: #000000;
+  --color-ink: #ffffff;
+  --color-body: #b9b9b9;
+  --color-ash: #8b8b8b;
+  --color-mute: #8b8b8b;
+  --color-hairline: #212121;
+  --color-hairline-strong: #353535;
+  --color-success: #19d600;
+  --color-warning: #f59e0b;
+  --color-info: #55beff;
+  --color-danger: #f26b6b;
+  --color-hero-warm: #f36458;
+  --color-hero-glow: #55beff;
+  --color-hero-pink: #e600ff;
+
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas font-display text-[15px] text-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold tracking-tight text-ink;
+  }
+
+  ::selection {
+    @apply bg-primary-strong text-white;
+  }
+}
+
+@layer components {
+  .label-mono {
+    @apply font-mono text-[11px] font-semibold tracking-wider text-ash uppercase;
+  }
+
+  .btn {
+    @apply inline-flex h-11 items-center justify-center gap-2 px-5 text-[15px] font-semibold transition-colors duration-150 select-none focus-visible:ring-2 focus-visible:ring-info/70 focus-visible:ring-offset-0 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  .btn-primary {
+    @apply rounded-full bg-primary-strong text-white hover:bg-secondary;
+  }
+
+  .btn-secondary {
+    @apply rounded-full border border-hairline-strong bg-surface text-ink hover:border-secondary hover:bg-secondary hover:text-white;
+  }
+
+  .btn-ghost {
+    @apply rounded-sm px-3 text-body hover:bg-secondary hover:text-white;
+  }
+
+  .btn-danger {
+    @apply rounded-full border border-danger/40 text-danger hover:border-danger hover:bg-danger hover:text-white;
+  }
+
+  .btn-sm {
+    @apply h-8 px-3.5 text-[13px];
+  }
+
+  .input {
+    @apply h-11 w-full rounded-xs border border-hairline-strong bg-canvas px-3 text-[15px] text-ink transition-colors placeholder:text-ash focus:border-secondary focus:ring-2 focus:ring-secondary/30 focus:outline-none;
+  }
+
+  textarea.input {
+    @apply h-auto py-2.5;
+  }
+
+  select.input {
+    @apply appearance-none pr-8;
+  }
+
+  .card {
+    @apply rounded-md border border-hairline bg-surface p-6;
+  }
+
+  .card-flat {
+    @apply rounded-md border border-hairline bg-surface;
+  }
+
+  .table-base {
+    @apply w-full text-left text-[15px];
+  }
+
+  .table-base thead th {
+    @apply border-b border-hairline px-3 py-3 font-mono text-[11px] font-semibold tracking-wider text-ash uppercase;
+  }
+
+  .table-base tbody td {
+    @apply border-b border-hairline px-3 py-3 align-middle text-body;
+  }
+
+  .table-base tbody tr:hover {
+    @apply bg-canvas/50;
+  }
+
+  .table-base tfoot td {
+    @apply px-3 py-3 text-ink;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[13px] font-medium;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-2.5 rounded-sm px-2.5 py-2 text-[14px] text-body transition-colors hover:bg-secondary hover:text-white focus-visible:ring-2 focus-visible:ring-info/70 focus-visible:ring-offset-0 focus-visible:outline-none;
+  }
+
+  .nav-link-active {
+    @apply bg-secondary text-white;
+  }
+
+  .nav-section {
+    @apply px-2.5 pt-5 pb-2 font-mono text-[10px] font-semibold tracking-[0.15em] text-mute uppercase;
+  }
+
+  .link {
+    @apply text-info underline-offset-4 hover:text-secondary hover:underline focus-visible:ring-2 focus-visible:ring-info/70 focus-visible:ring-offset-0 focus-visible:outline-none;
+  }
+
+  .error-text {
+    @apply mt-1 text-[13px] text-danger;
+  }
+
+  .stat-value {
+    @apply font-mono text-[26px] font-semibold tracking-tight text-ink tabular-nums;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

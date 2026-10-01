@@ -1,0 +1,27 @@
+<%- include('../../partials/head') %>
+
+<div class="mx-auto max-w-lg">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]">Edit Kategori</h2>
+      <a href="/categories" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+
+    <form method="post" action="/categories/<%= category.id %>/update" class="mt-5 space-y-4">
+      <div>
+        <label class="label-mono" for="namaKategori">Nama Kategori</label>
+        <input class="input mt-1.5" id="namaKategori" name="namaKategori" value="<%= values.namaKategori || '' %>" required>
+        <% if (errors.namaKategori) { %>
+        <p class="error-text"><%= errors.namaKategori[0] %></p>
+        <% } %>
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+    </form>
+
+    <form method="post" action="/categories/<%= category.id %>/delete" class="mt-5 border-t border-hairline pt-5">
+      <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus kategori ini?">Hapus Kategori</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

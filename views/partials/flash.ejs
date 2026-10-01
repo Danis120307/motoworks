@@ -1,0 +1,13 @@
+<%
+const flashMessages = typeof flash !== 'undefined' && flash ? flash : { success: null, error: null };
+%>
+<% if (flashMessages.success) { %>
+<div class="mb-5 rounded-md border border-success/20 border-l-[3px] border-l-success bg-success/10 px-4 py-3 text-[14px] text-success">
+  <%= flashMessages.success %>
+</div>
+<% } %>
+<% if (flashMessages.error) { %>
+<div class="mb-5 rounded-md border border-danger/20 border-l-[3px] border-l-danger bg-danger/10 px-4 py-3 text-[14px] text-danger">
+  <%= flashMessages.error %>
+</div>
+<% } %>

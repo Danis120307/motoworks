@@ -1,0 +1,47 @@
+<%- include('../../partials/head') %>
+
+<div class="mx-auto max-w-xl">
+  <div class="card">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[18px]"><%= customer ? 'Edit Pelanggan' : 'Tambah Pelanggan' %></h2>
+      <a href="/customers" class="btn btn-ghost btn-sm">Kembali</a>
+    </div>
+
+    <form method="post" action="<%= customer ? '/customers/' + customer.id + '/update' : '/customers' %>"
+      class="mt-5 space-y-4">
+      <div>
+        <label class="label-mono" for="nama">Nama Pelanggan</label>
+        <input class="input mt-1.5" id="nama" name="nama" value="<%= values.nama || '' %>">
+        <% if (errors.nama) { %><p class="error-text"><%= errors.nama[0] %></p><% } %>
+      </div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="label-mono" for="noHp">No HP</label>
+          <input class="input mt-1.5" id="noHp" name="noHp" value="<%= values.noHp || '' %>">
+          <% if (errors.noHp) { %><p class="error-text"><%= errors.noHp[0] %></p><% } %>
+        </div>
+        <div>
+          <label class="label-mono" for="platMotor">Plat Motor</label>
+          <input class="input mt-1.5" id="platMotor" name="platMotor" value="<%= values.platMotor || '' %>"
+            placeholder="cth. B 1234 XYZ">
+          <% if (errors.platMotor) { %><p class="error-text"><%= errors.platMotor[0] %></p><% } %>
+        </div>
+      </div>
+      <div>
+        <label class="label-mono" for="modelMotor">Model Motor</label>
+        <input class="input mt-1.5" id="modelMotor" name="modelMotor" value="<%= values.modelMotor || '' %>"
+          placeholder="cth. Vario 125">
+        <% if (errors.modelMotor) { %><p class="error-text"><%= errors.modelMotor[0] %></p><% } %>
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan</button>
+    </form>
+
+    <% if (customer) { %>
+    <form method="post" action="/customers/<%= customer.id %>/delete" class="mt-5 border-t border-hairline pt-5">
+      <button type="submit" class="btn btn-danger btn-sm" data-confirm="Hapus pelanggan ini?">Hapus Pelanggan</button>
+    </form>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../../partials/foot') %>

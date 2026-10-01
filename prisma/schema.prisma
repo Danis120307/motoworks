@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  nama          String
+  email         String         @unique
+  passwordHash  String         @map("password_hash")
+  role          String         @default("owner")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  serviceOrders ServiceOrder[]
+
+  @@map("users")
+}
+
+model Category {
+  id           Int         @id @default(autoincrement())
+  namaKategori String      @unique @map("nama_kategori")
+  spareParts   SparePart[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id             Int             @id @default(autoincrement())
+  nama           String
+  kontak         String?
+  alamat         String?
+  stockMovements StockMovement[]
+
+  @@map("suppliers")
+}
+
+model SparePart {
+  id             Int                @id @default(autoincrement())
+  kodeItem       String             @unique @map("kode_item")
+  nama           String
+  categoryId     Int?               @map("category_id")
+  satuan         String?
+  hargaBeli      Int                @default(0) @map("harga_beli")
+  hargaJual      Int                @default(0) @map("harga_jual")
+  stokSaatIni    Int                @default(0) @map("stok_saat_ini")
+  stokMinimum    Int                @default(5) @map("stok_minimum")
+  category       Category?          @relation(fields: [categoryId], references: [id])
+  stockMovements StockMovement[]
+  orderItems     ServiceOrderItem[]
+
+  @@map("spareparts")
+}
+
+model Customer {
+  id            Int            @id @default(autoincrement())
+  nama          String?
+  noHp          String?        @map("no_hp")
+  platMotor     String?        @map("plat_motor")
+  modelMotor    String?        @map("model_motor")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  serviceOrders ServiceOrder[]
+
+  @@map("customers")
+}
+
+model ServiceType {
+  id          Int               @id @default(autoincrement())
+  namaLayanan String            @map("nama_layanan")
+  hargaJasa   Int               @default(0) @map("harga_jasa")
+  orderItems  ServiceOrderItem[]
+
+  @@map("service_types")
+}
+
+model ServiceOrder {
+  id               Int                @id @default(autoincrement())
+  nomorOrder       String             @unique @map("nomor_order")
+  customerId       Int?               @map("customer_id")
+  userId           Int                @map("user_id")
+  tanggalMasuk     DateTime           @default(now()) @map("tanggal_masuk")
+  statusOrder      String             @default("menunggu") @map("status_order")
+  keluhan          String?
+  mekanik          String?
+  totalJasa        Int                @default(0) @map("total_jasa")
+  totalSparepart   Int                @default(0) @map("total_sparepart")
+  totalKeseluruhan Int                @default(0) @map("total_keseluruhan")
+  customer         Customer?          @relation(fields: [customerId], references: [id])
+  user             User               @relation(fields: [userId], references: [id])
+  items            ServiceOrderItem[]
+  payments         Payment[]
+  stockMovements   StockMovement[]
+
+  @@index([statusOrder])
+  @@index([tanggalMasuk])
+  @@map("service_orders")
+}
+
+model ServiceOrderItem {
+  id             Int          @id @default(autoincrement())
+  serviceOrderId Int          @map("service_order_id")
+  tipeItem       String       @map("tipe_item") // 'sparepart' | 'jasa'
+  sparePartId    Int?         @map("spare_part_id")
+  serviceTypeId  Int?         @map("service_type_id")
+  qty            Int          @default(1)
+  hargaSatuan    Int          @map("harga_satuan")
+  subtotal       Int
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  sparePart      SparePart?   @relation(fields: [sparePartId], references: [id])
+  serviceType    ServiceType? @relation(fields: [serviceTypeId], references: [id])
+
+  @@map("service_order_items")
+}
+
+model StockMovement {
+  id             Int           @id @default(autoincrement())
+  sparePartId    Int           @map("spare_part_id")
+  supplierId     Int?          @map("supplier_id")
+  serviceOrderId Int?          @map("service_order_id")
+  tipe           String // 'masuk' | 'keluar'
+  jumlah         Int
+  tanggal        DateTime      @default(now())
+  keterangan     String?
+  sparePart      SparePart     @relation(fields: [sparePartId], references: [id])
+  supplier       Supplier?     @relation(fields: [supplierId], references: [id])
+  serviceOrder   ServiceOrder? @relation(fields: [serviceOrderId], references: [id])
+
+  @@index([sparePartId])
+  @@index([tanggal])
+  @@map("stock_movements")
+}
+
+model Payment {
+  id             Int          @id @default(autoincrement())
+  serviceOrderId Int          @map("service_order_id")
+  tanggalBayar   DateTime     @default(now()) @map("tanggal_bayar")
+  jumlahBayar    Int          @map("jumlah_bayar")
+  metodeBayar    String?      @map("metode_bayar")
+  serviceOrder   ServiceOrder @relation(fields: [serviceOrderId], references: [id])
+
+  @@index([tanggalBayar])
+  @@map("payments")
+}
+
+model Expense {
+  id         Int      @id @default(autoincrement())
+  kategori   String
+  keterangan String?
+  jumlah     Int
+  tanggal    DateTime @default(now())
+
+  @@index([tanggal])
+  @@map("expenses")
+}
+
+model Setting {
+  id          Int     @id @default(1)
+  namaBengkel String  @default("Bengkel Motor") @map("nama_bengkel")
+  alamat      String?
+  telepon     String?
+  footerNota  String? @map("footer_nota")
+
+  @@map("settings")
+}

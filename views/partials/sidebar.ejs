@@ -1,0 +1,67 @@
+<aside id="sidebar"
+  class="fixed inset-y-0 left-0 z-40 flex w-52 -translate-x-full flex-col border-r border-hairline bg-surface-deep transition-transform duration-200 lg:translate-x-0">
+  <div class="flex h-[60px] items-center border-b border-hairline px-4">
+    <a href="/" class="font-mono text-[15px] font-semibold tracking-[0.2em] text-ink uppercase">
+      MOTO<span class="text-primary">WORKS</span>
+    </a>
+  </div>
+
+  <nav id="sidebarNav" class="relative flex-1 overflow-y-auto px-2.5 pb-6">
+    <p class="nav-section">Utama</p>
+    <a href="/" class="nav-link <%= active === 'dashboard' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'dashboard' }) %> Dashboard
+    </a>
+
+    <p class="nav-section">Operasional</p>
+    <a href="/orders" class="nav-link <%= active === 'orders' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'orders' }) %> Order Service
+    </a>
+    <a href="/stock" class="nav-link <%= active === 'stock' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'stock' }) %> Stok
+      <% if (lowStockCount > 0) { %>
+      <span class="badge ml-auto bg-warning/15 text-warning"><%= lowStockCount %></span>
+      <% } %>
+    </a>
+
+    <p class="nav-section">Master Data</p>
+    <a href="/spareparts" class="nav-link <%= active === 'spareparts' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'spareparts' }) %> Sparepart
+    </a>
+    <a href="/categories" class="nav-link <%= active === 'categories' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'categories' }) %> Kategori
+    </a>
+    <a href="/suppliers" class="nav-link <%= active === 'suppliers' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'suppliers' }) %> Supplier
+    </a>
+    <a href="/service-types" class="nav-link <%= active === 'service-types' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'services' }) %> Jenis Layanan
+    </a>
+    <a href="/customers" class="nav-link <%= active === 'customers' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'customers' }) %> Pelanggan
+    </a>
+
+    <p class="nav-section">Keuangan</p>
+    <a href="/expenses" class="nav-link <%= active === 'expenses' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'expenses' }) %> Pengeluaran
+    </a>
+    <a href="/reports/laba-rugi" class="nav-link <%= active === 'reports-laba-rugi' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'reports' }) %> Laba Rugi
+    </a>
+    <a href="/reports/stok" class="nav-link <%= active === 'reports-stok' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'stock' }) %> Laporan Stok
+    </a>
+    <a href="/reports/kas" class="nav-link <%= active === 'reports-kas' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'kas' }) %> Buku Kas
+    </a>
+
+    <p class="nav-section">Sistem</p>
+    <a href="/settings" class="nav-link <%= active === 'settings' ? 'nav-link-active' : '' %>">
+      <%- include('icon', { name: 'settings' }) %> Pengaturan
+    </a>
+  </nav>
+
+  <div class="border-t border-hairline p-4">
+    <p class="label-mono">Masuk sebagai</p>
+    <p class="mt-1 truncate text-[14px] text-ink"><%= user ? user.nama : 'Tamu' %></p>
+  </div>
+</aside>
